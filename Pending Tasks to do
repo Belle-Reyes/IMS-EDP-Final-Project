@@ -1,0 +1,25 @@
+things to do: 
+
+- create a pendingForm admin side that's able to approve requests for actions to be logged on the Invoice Logs
+
+- ensure that there would be pop ups indicating that you are ready to commit the changes and it cannot be unsaved
+
+- create logoutConfirmation Form
+
+- create actioncommitConfirmationForm that would record what the user has done and send it a request towards the admin
+
+- finish updateInventory Form
+
+- If unable to finish updateInventory Form get started on manageAccountForm
+
+- create a error handling on updateInventory Form
+
+- study how to use GitHub
+
+- drop table Logs create a new one that just has Username, Role, Action, Date
+
+- create new table pending for the admin to see the requests
+
+- setter getter for the username + role ng gumagamit
+
+- admin / User super key
