@@ -1,0 +1,91 @@
+//Initialize 
+    public viewInventoryForm()
+    {
+        InitializeComponent();
+        InitializeSortComboBox();
+        LoadData("A-Z");
+    }
+
+//Array List para sa combo box
+ private void InitializeSortComboBox()
+    {
+        string[] sortOptions = new string[]
+        {
+            "Recently Updated",
+            "A-Z",
+            "Z-A",
+            "Price (Low to High)",
+            "Price (High to Low)"
+        };
+
+        foreach (string option in sortOptions)
+        {
+            cbSortBy.Items.Add(option);
+        }
+
+        cbSortBy.SelectedIndex = 1;
+    }
+
+//Sort Method
+private void LoadData(string sortOrder = "A-Z")
+    {
+        using (SqlConnection con = new SqlConnection(connectionString))
+        {
+            using (SqlCommand cm = new SqlCommand())
+            {
+                cm.Connection = con;
+
+                try
+                {
+                    con.Open();
+                    string query = @"SELECT Brand, Model, Size, Quantity, PricePerPiece, (Quantity * PricePerPiece) AS TotalPrice FROM Inventory";
+                    string orderByClause = GetOrderByClause(sortOrder);
+                    query += orderByClause;
+
+                    cm.CommandText = query;
+
+                    SqlDataAdapter da = new SqlDataAdapter(cm);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dgvInventoryView.DataSource = dt;
+                }
+                catch (SqlException sqlEx)
+                {
+                    MessageBox.Show("SQL Error: " + sqlEx.Message);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("General Error: " + ex.Message);
+                }
+            }
+        }
+    }
+
+    private string GetOrderByClause(string sortOrder)
+    {
+        string orderBy = string.Empty;
+
+        switch (sortOrder)
+        {
+            case "A-Z":
+                orderBy = " ORDER BY Brand ASC";
+                break;
+            case "Z-A":
+                orderBy = " ORDER BY Brand DESC";
+                break;
+            case "Price (Low to High)":
+                orderBy = " ORDER BY PricePerPiece ASC";
+                break;
+            case "Price (High to Low)":
+                orderBy = " ORDER BY PricePerPiece DESC";
+                break;
+            case "Recently Updated":
+                orderBy = " ORDER BY UpdatedAt DESC";
+                break;
+            default:
+                orderBy = string.Empty;
+                break;
+        }
+
+        return orderBy;
+    }
