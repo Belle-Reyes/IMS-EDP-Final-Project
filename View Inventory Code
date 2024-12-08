@@ -1,0 +1,65 @@
+//View Inventory Form Code Block
+
+// Palagay this under ng InitializeComponent();
+ InitializeSortComboBox(); 
+ LoadData();
+
+private void InitializeSortComboBox()
+{
+    cbSortBy.Items.Add("Recently Updated");
+    cbSortBy.Items.Add("A-Z");
+    cbSortBy.Items.Add("Z-A");
+    cbSortBy.Items.Add("Price (Low to High)");
+    cbSortBy.Items.Add("Price (High to Low)");
+    cbSortBy.SelectedIndex = 1; // Default sort order is A-Z
+}
+
+private void LoadData(string sortOrder = "A-Z")
+{
+    using (SqlConnection con = new SqlConnection(connectionString))
+    {
+        using (SqlCommand cm = new SqlCommand())
+        {
+            cm.Connection = con;
+
+            try
+            {
+                con.Open(); // Open the database connection
+                string query = @"SELECT Brand, Model, Size, Quantity, PricePerPiece, (Quantity * PricePerPiece) AS TotalPrice FROM Inventory";
+
+                // Determine the sorting order based on user selection
+                switch (sortOrder)
+                {
+                    case "A-Z":
+                        query += " ORDER BY Brand ASC"; // Sort by Brand ascending
+                        break;
+                    case "Z-A":
+                        query += " ORDER BY Brand DESC"; // Sort by Brand descending
+                        break;
+                    case "Price (Low to High)":
+                        query += " ORDER BY PricePerPiece ASC"; // Sort by Price ascending
+                        break;
+                    case "Price (High to Low)":
+                        query += " ORDER BY PricePerPiece DESC"; // Sort by Price descending
+                        break;
+                    case "Recently Updated":
+                        query += " ORDER BY UpdatedAt DESC"; // Sort by most recently updated
+                        break;
+                    default:
+                        break;
+                }
+
+                cm.CommandText = query; // Set the SQL command text
+
+                SqlDataAdapter da = new SqlDataAdapter(cm);
+                DataTable dt = new DataTable();
+                da.Fill(dt); // Fill the DataTable with data from the database
+                dgvInventoryView.DataSource = dt; // Bind the DataTable to the DataGridView
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message); // Show any errors that occur
+            }
+        }
+    }
+}
